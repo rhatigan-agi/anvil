@@ -487,7 +487,7 @@ Discovery can be fully local (AST scanning). Governance is deterministic (no ext
 
 ## Citation
 
-```bibtex
+```
 @misc{rhatigan2026anvil,
   author = {Rhatigan, Jeffrey},
   title = {Anvil: A Specification for Deterministic AI-Assisted Development},
@@ -501,7 +501,7 @@ Discovery can be fully local (AST scanning). Governance is deterministic (no ext
 
 <div align="center">
 
-**Created by [Jeff Rhatigan](https://github.com/rhatigan) at [Rhatigan Labs](https://rhatiganlabs.com)**
+**Created by [Jeff Rhatigan](https://github.com/rhatigan-agi) at [Rhatigan Labs](https://rhatigan.ai)**
 
 *A prompt can be ignored. A compiler invariant cannot.*
 
