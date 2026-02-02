@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/issue.schema.json",
+  "title": "Issue",
+  "description": "A structured work unit derived from an intent with coverage validation (NEW in v0.2.0)",
+  "type": "object",
+  "required": ["id", "intentId", "discoveryId", "title", "summary", "backendCriteria", "frontendCriteria", "technicalRequirements", "filesAffected", "coverage", "generatedAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this issue"
+    },
+    "intentId": {
+      "type": "string",
+      "description": "ID of the originating intent"
+    },
+    "discoveryId": {
+      "type": "string",
+      "description": "ID of the discovery result"
+    },
+    "title": {
+      "type": "string",
+      "description": "Issue title",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "description": "Detailed issue summary",
+      "minLength": 1
+    },
+    "backendCriteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "completed"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Acceptance criterion description"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Whether this criterion is completed"
+          }
+        }
+      },
+      "description": "Backend acceptance criteria"
+    },
+    "frontendCriteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "completed"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Acceptance criterion description"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Whether this criterion is completed"
+          }
+        }
+      },
+      "description": "Frontend acceptance criteria"
+    },
+    "technicalRequirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Technical requirements for implementation"
+    },
+    "filesAffected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "action", "reason"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "File path"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["modify", "create", "verify"],
+            "description": "Action to be taken on this file"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this file is affected"
+          }
+        }
+      },
+      "description": "Files that will be affected by this issue"
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["intentConcerns", "issueConcerns", "status"],
+      "properties": {
+        "intentConcerns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["backend", "frontend", "database", "validation", "testing"]
+          },
+          "description": "Concerns identified in the intent"
+        },
+        "issueConcerns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["backend", "frontend", "database", "validation", "testing"]
+          },
+          "description": "Concerns addressed in the issue"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["complete", "partial"],
+          "description": "Coverage status - MUST be complete or justified"
+        },
+        "missingConcerns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["backend", "frontend", "database", "validation", "testing"]
+          },
+          "description": "Concerns from intent not addressed in issue"
+        },
+        "deferralJustification": {
+          "type": "string",
+          "description": "Justification if concerns are deferred (required if status is partial)"
+        }
+      },
+      "description": "Coverage validation - ensures lossless Intent→Issue transformation"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when issue was generated"
+    }
+  },
+  "additionalProperties": false
+}
+

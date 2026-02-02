@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/plan.schema.json",
+  "title": "Plan",
+  "description": "A proposed sequence of phases derived from an issue and grounded in discovery facts",
+  "type": "object",
+  "required": ["id", "issueId", "discoveryId", "intentId", "timestamp", "phases", "groundingReport"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this plan"
+    },
+    "issueId": {
+      "type": "string",
+      "description": "ID of the issue this plan addresses"
+    },
+    "discoveryId": {
+      "type": "string",
+      "description": "ID of the discovery result this plan is based on"
+    },
+    "intentId": {
+      "type": "string",
+      "description": "ID of the originating intent"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when plan was created"
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "$ref": "phase.schema.json"
+      },
+      "description": "Ordered phases in this plan",
+      "minItems": 1
+    },
+    "groundingReport": {
+      "type": "object",
+      "required": ["planId", "totalClaims", "groundedClaims", "groundingRatio", "verdict"],
+      "properties": {
+        "planId": {
+          "type": "string"
+        },
+        "totalClaims": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "groundedClaims": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "groundingRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "groundedClaims / totalClaims - MUST be 1.0"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["fully_grounded", "partially_grounded", "ungrounded"],
+          "description": "Grounding verdict"
+        }
+      },
+      "description": "Grounding report - ratio must be 1.0 for plan to be valid"
+    }
+  },
+  "additionalProperties": false
+}
+

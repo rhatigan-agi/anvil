@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/governance-result.schema.json",
+  "title": "GovernanceResult",
+  "description": "Post-execution governance evaluation with fixability classification (NEW in v0.2.0)",
+  "type": "object",
+  "required": ["id", "executionId", "timestamp", "verdict", "checks", "violations", "nextAction"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this governance result"
+    },
+    "executionId": {
+      "type": "string",
+      "description": "ID of the execution result being governed"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when governance completed"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["pass", "fail"],
+      "description": "Final verdict of governance evaluation"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "ruleName", "status"],
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Rule identifier (e.g., GOV-005)"
+          },
+          "ruleName": {
+            "type": "string",
+            "description": "Human-readable rule name"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "fail"],
+            "description": "Status of this check"
+          },
+          "details": {
+            "type": "string",
+            "description": "Optional details about the check"
+          }
+        }
+      },
+      "description": "Individual governance checks performed"
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "ruleName", "tier", "fixability", "message"],
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Rule identifier (e.g., GOV-005)"
+          },
+          "ruleName": {
+            "type": "string",
+            "description": "Human-readable rule name"
+          },
+          "tier": {
+            "type": "string",
+            "enum": ["L0", "L1", "L2", "L3"],
+            "description": "Governance tier of this rule"
+          },
+          "fixability": {
+            "type": "string",
+            "enum": ["auto", "human", "never"],
+            "description": "How this violation can be fixed"
+          },
+          "file": {
+            "type": "string",
+            "description": "File where violation occurred"
+          },
+          "line": {
+            "type": "integer",
+            "description": "Line number where violation occurred"
+          },
+          "message": {
+            "type": "string",
+            "description": "Description of the violation"
+          },
+          "remediation": {
+            "type": "string",
+            "description": "Suggested remediation"
+          }
+        }
+      },
+      "description": "All violations found during governance"
+    },
+    "nextAction": {
+      "type": "string",
+      "enum": ["commit", "repair", "rollback"],
+      "description": "What should happen next based on governance result"
+    }
+  },
+  "additionalProperties": false
+}
+

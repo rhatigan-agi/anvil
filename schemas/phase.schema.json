@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/phase.schema.json",
+  "title": "Phase",
+  "description": "An atomic unit of work within a plan (formerly PlanStep)",
+  "type": "object",
+  "required": ["id", "sequence", "phaseType", "description", "dependsOn", "grounding", "filesToModify", "filesThatMayBeCreated", "changes", "tests", "scopeDeclaration"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this phase"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Execution order (1-based)"
+    },
+    "phaseType": {
+      "type": "string",
+      "enum": ["database", "backend", "frontend", "testing", "infrastructure"],
+      "description": "Type of phase"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of what this phase does",
+      "minLength": 1
+    },
+    "dependsOn": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Phase IDs this phase depends on"
+    },
+    "grounding": {
+      "type": "object",
+      "required": ["existingState", "discoveryFactIds", "assumptions"],
+      "properties": {
+        "existingState": {
+          "type": "string",
+          "description": "Description of the existing state"
+        },
+        "discoveryFactIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Discovery fact IDs that support this phase"
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Assumptions made in this phase"
+        }
+      },
+      "description": "Grounding information for this phase"
+    },
+    "filesToModify": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Files that will be modified"
+    },
+    "filesThatMayBeCreated": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Files that may be created"
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Detailed change descriptions"
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Test specifications for this phase"
+    },
+    "scopeDeclaration": {
+      "type": "object",
+      "required": ["allowedFiles", "forbiddenOperations"],
+      "properties": {
+        "allowedFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Files this phase is allowed to modify"
+        },
+        "forbiddenOperations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Operations this phase must not perform"
+        }
+      },
+      "description": "Explicit scope declaration for governance"
+    }
+  },
+  "additionalProperties": false
+}
+

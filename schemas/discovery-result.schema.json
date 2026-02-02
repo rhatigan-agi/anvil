@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/discovery-result.schema.json",
+  "title": "DiscoveryResult",
+  "description": "Complete result of the discovery phase with 4-pass structure",
+  "type": "object",
+  "required": ["id", "intentId", "timestamp", "outcome", "passes", "facts", "examinedFiles"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this discovery result"
+    },
+    "intentId": {
+      "type": "string",
+      "description": "ID of the intent that triggered this discovery"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when discovery completed"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failed", "resolution_required"],
+      "description": "Overall outcome of discovery"
+    },
+    "passes": {
+      "type": "object",
+      "description": "Results from the 4 discovery passes",
+      "required": ["pass1", "pass2", "pass3", "pass4"],
+      "properties": {
+        "pass1": {
+          "type": "object",
+          "description": "Framework Detection",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["success", "failed"]
+            },
+            "frameworks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "confidence": { "type": "string", "enum": ["absolute", "high", "signal"] }
+                }
+              }
+            }
+          }
+        },
+        "pass2": {
+          "type": "object",
+          "description": "Surface Discovery (AST scanning - AUTHORITATIVE)",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["success", "failed"]
+            },
+            "modelsFound": {
+              "type": "integer"
+            },
+            "viewsFound": {
+              "type": "integer"
+            },
+            "componentsFound": {
+              "type": "integer"
+            }
+          }
+        },
+        "pass3": {
+          "type": "object",
+          "description": "Ownership Binding",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["success", "failed", "resolution_required"]
+            },
+            "ownershipDetermined": {
+              "type": "boolean"
+            }
+          }
+        },
+        "pass4": {
+          "type": "object",
+          "description": "Schema Sufficiency (DETERMINISTIC, non-LLM)",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["success", "failed"]
+            },
+            "schemaSufficiency": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "required": ["model", "migrationRequired"],
+                "properties": {
+                  "model": { "type": "string" },
+                  "migrationRequired": { "type": "boolean" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": { "$ref": "discovery-fact.schema.json" },
+      "description": "All facts extracted during discovery"
+    },
+    "examinedFiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Files examined during discovery - LINKER PRINCIPLE"
+    },
+    "frontendEntryPoints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Frontend entry points discovered"
+    },
+    "backendEntryPoints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Backend entry points discovered"
+    },
+    "existingModels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "file": { "type": "string" }
+        }
+      },
+      "description": "Models found in the codebase"
+    },
+    "modelFields": {
+      "type": "object",
+      "description": "Field information for each model",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "type": { "type": "string" },
+            "nullable": { "type": "boolean" },
+            "primaryKey": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "schemaSufficiency": {
+      "type": "object",
+      "description": "Schema sufficiency from Pass 4",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["model", "migrationRequired"],
+        "properties": {
+          "model": { "type": "string" },
+          "migrationRequired": { "type": "boolean" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "canonicalDomains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "canonical": { "type": "string" },
+          "aliases": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "description": "Domain information from registry"
+    },
+    "userResolution": {
+      "$ref": "user-resolution.schema.json",
+      "description": "User resolution if required (Pass 3)"
+    }
+  },
+  "additionalProperties": false
+}
+

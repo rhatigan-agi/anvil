@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/domain-registry.schema.json",
+  "title": "DomainRegistry",
+  "description": "Registry enforcing canonical terminology to prevent AI-induced fragmentation (NEW in v0.2.0)",
+  "type": "object",
+  "required": ["version", "domains"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "Version number of this registry",
+      "minimum": 1
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["canonical", "presentationAliases", "backend", "frontend"],
+        "properties": {
+          "canonical": {
+            "type": "string",
+            "description": "Canonical domain name (e.g., Task)",
+            "minLength": 1
+          },
+          "presentationAliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Allowed aliases for presentation (e.g., TODO, Activity)"
+          },
+          "backend": {
+            "type": "object",
+            "required": ["namingRule"],
+            "properties": {
+              "namingRule": {
+                "type": "string",
+                "enum": ["canonical_only"],
+                "description": "Backend MUST use canonical name only"
+              }
+            },
+            "description": "Backend naming rules - enforced by GOV-009"
+          },
+          "frontend": {
+            "type": "object",
+            "required": ["allowedAliases"],
+            "properties": {
+              "allowedAliases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Frontend MAY use these aliases"
+              }
+            },
+            "description": "Frontend naming rules - more permissive"
+          }
+        }
+      },
+      "description": "Domain definitions"
+    }
+  },
+  "additionalProperties": false
+}
+

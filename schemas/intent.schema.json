@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/intent.schema.json",
+  "title": "Intent",
+  "description": "A user's expressed desire for code modification or creation",
+  "type": "object",
+  "required": ["id", "description", "createdAt", "user", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier (e.g., INTENT_007)",
+      "pattern": "^[A-Z_0-9]+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Natural language description of desired change",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when intent was created"
+    },
+    "user": {
+      "type": "string",
+      "description": "User identifier"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional categorization tags"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "created",
+        "discovery_complete",
+        "issue_generated",
+        "planned",
+        "validated",
+        "executed",
+        "governed",
+        "committed",
+        "failed"
+      ],
+      "description": "Current status of the intent in the pipeline"
+    }
+  },
+  "additionalProperties": false
+}
+

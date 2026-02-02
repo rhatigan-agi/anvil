@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/constraint.schema.json",
+  "title": "Constraint",
+  "description": "A governance constraint that controls whether actions are permitted",
+  "type": "object",
+  "required": ["id", "name", "description", "tier", "fixability", "scope", "predicate", "message"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier (e.g., GOV-005)",
+      "pattern": "^GOV-[0-9]{3}$|^[a-z-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable constraint name",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of what this constraint enforces"
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["L0", "L1", "L2", "L3"],
+      "description": "Governance tier: L0 (structural), L1 (policy), L2 (advisory), L3 (human)"
+    },
+    "fixability": {
+      "type": "string",
+      "enum": ["auto", "human", "never"],
+      "description": "How violations can be fixed"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "filePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Glob patterns for file targeting"
+        },
+        "actionTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Action types this constraint applies to"
+        },
+        "phaseTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Phase types this constraint applies to"
+        },
+        "all": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this constraint applies to all actions"
+        }
+      },
+      "description": "What this constraint applies to"
+    },
+    "predicate": {
+      "type": "object",
+      "description": "The condition that determines permit/deny",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of predicate"
+        },
+        "expression": {
+          "type": "string",
+          "description": "The condition expression to evaluate"
+        }
+      }
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable message when constraint triggers",
+      "minLength": 1
+    },
+    "remediation": {
+      "type": "string",
+      "description": "Suggested remediation when violated"
+    }
+  },
+  "additionalProperties": false
+}
+

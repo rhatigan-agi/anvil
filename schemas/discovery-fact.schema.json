@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/discovery-fact.schema.json",
+  "title": "DiscoveryFact",
+  "description": "A verifiable assertion about the codebase extracted through deterministic analysis",
+  "type": "object",
+  "required": ["id", "factType", "claim", "evidence", "confidence", "source", "provenance", "extractedAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this fact"
+    },
+    "factType": {
+      "type": "string",
+      "description": "Category of fact (implementation-specific)"
+    },
+    "claim": {
+      "type": "string",
+      "description": "Human-readable assertion this fact makes",
+      "minLength": 1
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Proof supporting the claim",
+      "required": ["method", "rawData"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "ast_parse",
+            "schema_introspection",
+            "static_analysis",
+            "file_system",
+            "human_type_cast"
+          ],
+          "description": "How this fact was extracted"
+        },
+        "rawData": {
+          "description": "The underlying data supporting the claim"
+        },
+        "verificationCommand": {
+          "type": "string",
+          "description": "Optional command to re-verify this fact"
+        }
+      },
+      "additionalProperties": false
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["absolute", "high", "signal"],
+      "description": "Confidence level: absolute (AST-scanned), high (static analysis), signal (heuristic)"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["deterministic", "framework_scanner", "user_resolution"],
+      "description": "Source classification for this fact"
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Source information for this fact",
+      "required": [],
+      "properties": {
+        "sourceFile": {
+          "type": "string",
+          "description": "File this fact was extracted from"
+        },
+        "lineStart": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lineEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "extractorVersion": {
+          "type": "string",
+          "description": "Version of the extractor that produced this fact"
+        }
+      },
+      "additionalProperties": true
+    },
+    "extractedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when fact was extracted"
+    }
+  },
+  "additionalProperties": false
+}
+

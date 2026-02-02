@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/user-resolution.schema.json",
+  "title": "UserResolution",
+  "description": "A human decision that resolves ambiguity discovered during the pipeline",
+  "type": "object",
+  "required": ["resolutionType", "question", "options", "userChoice", "resolvedAt"],
+  "properties": {
+    "resolutionType": {
+      "type": "string",
+      "enum": ["frontend_scope", "frontend_placement", "ownership_ambiguity"],
+      "description": "Type of ambiguity being resolved"
+    },
+    "question": {
+      "type": "string",
+      "description": "The question posed to the user",
+      "minLength": 1
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Available options for resolution",
+      "minItems": 2
+    },
+    "userChoice": {
+      "type": "string",
+      "description": "The option selected by the user"
+    },
+    "resolvedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when resolution was made"
+    }
+  },
+  "additionalProperties": false
+}
+

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/validation-result.schema.json",
+  "title": "ValidationResult",
+  "description": "Result of pre-execution validation of a plan against deterministic checks",
+  "type": "object",
+  "required": ["id", "planId", "timestamp", "verdict", "checks", "errors", "warnings"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this validation result"
+    },
+    "planId": {
+      "type": "string",
+      "description": "ID of the plan that was validated"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when validation completed"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["pass", "fail", "repairable"],
+      "description": "Final verdict of the validation"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "passed"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the validation check"
+          },
+          "passed": {
+            "type": "boolean",
+            "description": "Whether this check passed"
+          },
+          "message": {
+            "type": "string",
+            "description": "Optional message about the check"
+          }
+        }
+      },
+      "description": "Individual validation checks performed"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check", "message", "repairable"],
+        "properties": {
+          "check": {
+            "type": "string",
+            "description": "Name of the check that failed"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "repairable": {
+            "type": "boolean",
+            "description": "Whether this error can be repaired"
+          }
+        }
+      },
+      "description": "Validation errors"
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "check": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Validation warnings"
+    }
+  },
+  "additionalProperties": false
+}
+

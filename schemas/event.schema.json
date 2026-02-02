@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/event.schema.json",
+  "title": "Event",
+  "description": "Timeline event in the Anvil pipeline (Tier 1 memory)",
+  "type": "object",
+  "required": ["id", "timestamp", "eventType", "intentId"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this event"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when event occurred"
+    },
+    "eventType": {
+      "type": "string",
+      "description": "Type of event",
+      "enum": [
+        "intent_created",
+        "discovery_started",
+        "discovery_completed",
+        "issue_generated",
+        "plan_generated",
+        "plan_validated",
+        "execution_started",
+        "execution_completed",
+        "governance_passed",
+        "governance_failed",
+        "repair_started",
+        "committed",
+        "failed"
+      ]
+    },
+    "intentId": {
+      "type": "string",
+      "description": "ID of the related intent"
+    },
+    "agent": {
+      "type": "string",
+      "description": "What produced this event (system, discovery, planner, executor, governance, user)"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status of the event"
+    },
+    "input": {
+      "type": "object",
+      "description": "Input data for this event",
+      "additionalProperties": true
+    },
+    "output": {
+      "type": "object",
+      "description": "Output data from this event",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
+

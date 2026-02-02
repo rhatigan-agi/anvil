@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/execution-result.schema.json",
+  "title": "ExecutionResult",
+  "description": "Result of executing a validated plan with complete provenance",
+  "type": "object",
+  "required": ["id", "planId", "validationId", "timestamp", "status", "phaseResults", "changes", "rollbackAvailable", "duration"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this execution result"
+    },
+    "planId": {
+      "type": "string",
+      "description": "ID of the plan that was executed"
+    },
+    "validationId": {
+      "type": "string",
+      "description": "ID of the validation result that permitted execution"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when execution completed"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed", "rolled_back"],
+      "description": "Overall execution status"
+    },
+    "phaseResults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phaseId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "failed", "skipped"]
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in milliseconds"
+          }
+        }
+      },
+      "description": "Results for each phase executed"
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "phaseId", "file", "action", "afterHash", "timestamp"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this change"
+          },
+          "phaseId": {
+            "type": "string",
+            "description": "ID of the phase that produced this change"
+          },
+          "file": {
+            "type": "string",
+            "description": "File that was modified"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["create", "modify", "delete"],
+            "description": "Type of action performed"
+          },
+          "beforeHash": {
+            "type": "string",
+            "description": "Content hash before the change"
+          },
+          "afterHash": {
+            "type": "string",
+            "description": "Content hash after the change"
+          },
+          "linesAdded": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "linesRemoved": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when change was made"
+          }
+        }
+      },
+      "description": "All changes made during execution"
+    },
+    "rollbackAvailable": {
+      "type": "boolean",
+      "description": "Whether rollback is possible"
+    },
+    "duration": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total execution duration in milliseconds"
+    }
+  },
+  "additionalProperties": false
+}
+

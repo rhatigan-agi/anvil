@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anvil-spec.dev/schemas/v0.2.0/provenance-chain.schema.json",
+  "title": "ProvenanceChain",
+  "description": "Complete trace linking an output to its originating inputs",
+  "type": "object",
+  "required": ["id", "outputId", "timestamp", "nodes"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this provenance chain"
+    },
+    "outputId": {
+      "type": "string",
+      "description": "ID of the artifact this chain describes"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when chain was created"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "artifactId", "inputs", "timestamp", "agent"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this node"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "intent",
+              "discovery_fact",
+              "user_resolution",
+              "issue",
+              "plan_phase",
+              "validation_result",
+              "execution_change",
+              "governance_result"
+            ],
+            "description": "Type of provenance node"
+          },
+          "artifactId": {
+            "type": "string",
+            "description": "ID of the artifact"
+          },
+          "artifactHash": {
+            "type": "string",
+            "description": "Content hash for verification"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of parent nodes this node was derived from"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When this node was created"
+          },
+          "agent": {
+            "type": "string",
+            "description": "What produced this node (system, discovery, planner, executor, governance, user)"
+          }
+        }
+      },
+      "description": "Nodes in the provenance graph",
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}
+

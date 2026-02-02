@@ -1,0 +1,268 @@
+# Anvil Governance Stack Example
+# Standard governance configuration aligned with Anvil v0.2.0
+#
+# This implements the standard rules GOV-001 through GOV-009
+# plus additional advisory and human governance rules.
+
+id: stack-standard-v020
+name: Standard Anvil Governance
+version: 2.0.0
+description: |
+  Standard governance stack implementing all Anvil v0.2.0 required rules
+  (GOV-001 through GOV-009) plus recommended advisory rules.
+
+metadata:
+  author: Rhatigan Labs
+  createdAt: "2026-02-01T00:00:00Z"
+  specVersion: "0.2.0"
+  license: CC-BY-4.0
+
+constraints:
+  # ============================================================================
+  # L0: STRUCTURAL INVARIANTS (fixability: NEVER)
+  # These can NEVER be overridden. Fundamental safety boundaries.
+  # ============================================================================
+
+  - id: GOV-005
+    name: Phase scope enforcement
+    description: Phase writes files outside declared scope
+    tier: L0
+    fixability: never
+    scope:
+      all: true
+    predicate:
+      type: custom
+      expression: "action.target IN phase.scopeDeclaration.allowedFiles"
+    message: "Cannot modify files outside the declared phase scope."
+
+  - id: GOV-006
+    name: Generated file protection
+    description: No modifications to generated files
+    tier: L0
+    fixability: never
+    scope:
+      filePatterns:
+        - "**/migrations/**"
+        - "**/package-lock.json"
+        - "**/yarn.lock"
+        - "**/poetry.lock"
+        - "**/*_pb2.py"
+        - "**/*.pb.go"
+        - "**/dist/**"
+        - "**/build/**"
+        - "**/.next/**"
+        - "**/node_modules/**"
+    predicate:
+      type: file_path_exclude
+      expression: "action.target NOT MATCHES scope.filePatterns"
+    message: "Cannot modify generated files. Modify source files instead."
+    remediation: "Modify the source file that generates this output."
+
+  - id: GOV-007
+    name: File creation scope
+    description: No file creation outside phase scope
+    tier: L0
+    fixability: never
+    scope:
+      actionTypes:
+        - create_file
+    predicate:
+      type: custom
+      expression: "action.target IN phase.scopeDeclaration.allowedFiles OR action.target IN phase.filesThatMayBeCreated"
+    message: "Cannot create files outside the declared phase scope."
+
+  - id: GOV-008
+    name: Domain uniqueness
+    description: No duplicate domain definitions
+    tier: L0
+    fixability: never
+    scope:
+      all: true
+    predicate:
+      type: custom
+      expression: "NOT duplicatesDomain(action.target, domainRegistry)"
+    message: "Duplicate domain definition detected."
+
+  - id: GOV-009
+    name: Canonical domain enforcement
+    description: Backend must use canonical domain names
+    tier: L0
+    fixability: never
+    scope:
+      filePatterns:
+        - "**/api/**"
+        - "**/backend/**"
+        - "**/server/**"
+        - "**/models/**"
+        - "**/services/**"
+    predicate:
+      type: custom
+      expression: "usesCanonicalDomainNames(action.content, domainRegistry)"
+    message: "Backend code must use canonical domain names, not aliases."
+    remediation: "Replace alias with canonical domain name from registry."
+
+  # ============================================================================
+  # L1: PROJECT POLICY (fixability: HUMAN)
+  # Configurable but enforced. Requires human decision to proceed.
+  # ============================================================================
+
+  - id: GOV-001
+    name: Model creation control
+    description: No new models without explicit intent
+    tier: L1
+    fixability: human
+    scope:
+      actionTypes:
+        - create_model
+        - add_model
+    predicate:
+      type: custom
+      expression: "intentExplicitlyMentions('model', 'schema', 'database')"
+    message: "New model creation requires explicit mention in intent."
+
+  - id: GOV-002
+    name: Security change control
+    description: No auth/security changes without security intent
+    tier: L1
+    fixability: human
+    scope:
+      filePatterns:
+        - "**/auth/**"
+        - "**/security/**"
+        - "**/permissions/**"
+        - "**/crypto/**"
+        - "**/*auth*"
+        - "**/*permission*"
+        - "**/*security*"
+    predicate:
+      type: custom
+      expression: "intentExplicitlyMentions('auth', 'security', 'permission')"
+    message: "Security-related changes require explicit security intent."
+
+  - id: GOV-003
+    name: Infrastructure protection
+    description: No production infra mutation from non-infra intent
+    tier: L1
+    fixability: human
+    scope:
+      filePatterns:
+        - "**/terraform/**"
+        - "**/kubernetes/**"
+        - "**/k8s/**"
+        - "**/infra/**"
+        - "**/deploy/**"
+        - "**/.github/workflows/**"
+        - "**/Dockerfile*"
+        - "**/docker-compose*"
+    predicate:
+      type: custom
+      expression: "intentExplicitlyMentions('infra', 'deploy', 'infrastructure')"
+    message: "Infrastructure changes require explicit infrastructure intent."
+
+  - id: GOV-004
+    name: Test deletion control
+    description: No test deletion without justification
+    tier: L1
+    fixability: human
+    scope:
+      actionTypes:
+        - delete_file
+      filePatterns:
+        - "**/*test*"
+        - "**/*spec*"
+        - "**/tests/**"
+        - "**/__tests__/**"
+    predicate:
+      type: custom
+      expression: "hasTestDeletionJustification(action)"
+    message: "Test deletion requires explicit justification."
+
+  # ============================================================================
+  # L2: BEHAVIORAL SIGNALS (advisory only)
+  # These produce warnings but don't block execution.
+  # ============================================================================
+
+  - id: ADV-001
+    name: Scope size warning
+    description: Large changes affecting many files may need review
+    tier: L2
+    fixability: auto
+    scope:
+      all: true
+    predicate:
+      type: scope_size_limit
+      expression: "LENGTH(plan.phases) <= 5"
+      parameters:
+        maxPhases: 5
+    message: "Large scope detected (>5 phases). Consider breaking into smaller changes."
+
+  - id: ADV-002
+    name: Complexity warning
+    description: High complexity changes benefit from review
+    tier: L2
+    fixability: auto
+    scope:
+      all: true
+    predicate:
+      type: custom
+      expression: "totalLinesChanged <= 500"
+    message: "High complexity change detected (>500 lines). Consider peer review."
+
+  - id: ADV-003
+    name: Missing tests warning
+    description: New functions should have tests
+    tier: L2
+    fixability: auto
+    scope:
+      actionTypes:
+        - add_function
+    predicate:
+      type: custom
+      expression: "hasCorrespondingTest(action.target)"
+    message: "New function without corresponding test detected."
+
+  # ============================================================================
+  # L3: HUMAN GOVERNANCE (requires human decision)
+  # Cannot proceed without explicit approval.
+  # ============================================================================
+
+  - id: HUM-001
+    name: API contract changes
+    description: Public API changes affect downstream consumers
+    tier: L3
+    fixability: human
+    scope:
+      filePatterns:
+        - "**/api/**"
+        - "**/*.proto"
+        - "**/openapi.*"
+        - "**/swagger.*"
+    predicate:
+      type: custom
+      expression: "isBreakingApiChange(action)"
+    message: "Breaking API change requires human approval."
+
+  - id: HUM-002
+    name: Ownership ambiguity
+    description: Multiple valid targets require human selection
+    tier: L3
+    fixability: human
+    scope:
+      all: true
+    predicate:
+      type: custom
+      expression: "NOT hasUnresolvedOwnershipAmbiguity()"
+    message: "Multiple valid targets detected. Human must select location."
+
+# Statistics
+statistics:
+  totalConstraints: 14
+  byTier:
+    L0: 5
+    L1: 4
+    L2: 3
+    L3: 2
+  byFixability:
+    never: 5
+    human: 6
+    auto: 3
