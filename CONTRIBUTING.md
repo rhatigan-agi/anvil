@@ -81,7 +81,7 @@ Constructive, good-faith engagement. Critique ideas, not people.
 
 ## Questions?
 
-Open a Discussion or reach out to [@rhatigan](https://github.com/rhatigan-agi).
+Open a Discussion or reach out to [@rhatigan-agi](https://github.com/rhatigan-agi).
 
 ---
 
